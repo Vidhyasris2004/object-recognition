@@ -1,0 +1,25 @@
+import cv2
+import numpy as np
+import tensorflow as tf
+model_path = 'saved_model/'
+model = tf.saved_model.load(model_path)
+infer = model.signatures['serving_default']
+image_path = 'path/to/your/image.jpg'
+image = cv2.imread(image_path)
+input_tensor = tf.convert_to_tensor(image)
+input_tensor = input_tensor[tf.newaxis, ...]
+output_dict = infer(input_tensor)
+boxes = output_dict['detection_boxes'].numpy()
+scores = output_dict['detection_scores'].numpy()
+classes = output_dict['detection_classes'].numpy()
+for i in range(len(scores[0])):
+    if scores[0][i] > 0.5:  # Confidence threshold
+        box = boxes[0][i]
+        (startY, startX, endY, endX) = box
+        (startX, startY, endX, endY) = (startX * image.shape[1], startY * image.shape[0], endX * image.shape[1], endY * image.shape[0])
+        cv2.rectangle(image, (int(startX), int(startY)), (int(endX), int(endY)), (0, 255, 0), 2)
+        label = int(classes[0][i])
+        cv2.putText(image, f'Class {label}: {scores[0][i]:.2f}', (int(startX), int(startY) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+cv2.imshow('Object Detection', image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
