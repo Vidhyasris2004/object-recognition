@@ -1,0 +1,4 @@
+pip install tensorflow tensorflow-hub tensorflow-datasets opencv-python
+git clone https://github.com/tensorflow/models.git
+cd models/research/
+pip install 
