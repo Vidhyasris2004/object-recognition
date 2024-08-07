@@ -1,0 +1,37 @@
+import os
+import tensorflow as tf
+from object_detection.utils import ops as utils_ops
+from object_detection.utils import label_map_util
+from object_detection.utils import visualization_utils as vis_util
+from object_detection.utils import object_detection
+from object_detection.utils import ops as utils_ops
+from object_detection.utils import label_map_util
+from object_detection.utils import visualization_utils as vis_util
+PATH_TO_CFG = 'models/research/object_detection/samples/configs/ssd_mobilenet_v2_coco.config'
+PATH_TO_FROZEN_GRAPH = 'models/research/object_detection/ssd_mobilenet_v2_coco/frozen_inference_graph.pb'
+PATH_TO_LABELS = 'models/research/object_detection/data/mscoco_label_map.pbtxt'
+def create_estimator():
+    from object_detection.utils import ops as utils_ops
+    from object_detection.utils import label_map_util
+    from object_detection.utils import visualization_utils as vis_util
+    model_config = tf.estimator.RunConfig(model_dir='model/')
+    estimator = tf.estimator.Estimator(model_fn=model_fn, config=model_config)
+    return estimator
+def model_fn(features, labels, mode):
+    # Define your model architecture here
+    pass
+def input_fn():
+    # Define how to read your data and create TensorFlow dataset
+    pass
+estimator = create_estimator()
+estimator.train(input_fn=input_fn, steps=10000)
+def save_model(estimator):
+    feature_spec = {
+        'image_tensor': tf.placeholder(dtype=tf.uint8, shape=[None, None, None])
+    }
+    export_dir = 'saved_model/'
+    export_strategy = tf.estimator.experimental.make_export_strategy(
+        serving_input_receiver_fn=tf.estimator.export.build_raw_serving_input_receiver_fn(feature_spec),
+        exports_to_keep=5
+    )
+    estimator.export_saved_model(export_dir, export_strategy)
